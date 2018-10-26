@@ -2,7 +2,7 @@ library(dplyr)
 library(pacman)
 library(ggplot2)
   
-cadastrocivil <- read.csv2("/home/gudnunes/Área de Trabalho/Mineração de dados/MD2018/dados/cadastrocivil.csv", header = TRUE, sep = ";")
+cadastrocivil <- read.csv2("/home/gudnunes/Área de Trabalho/MD/MD2018/cadastrocivil.csv", header = TRUE, sep = ";")
 cadastrocivil <- select(cadastrocivil, c("NOME","SITUACAO_VINCULO","RG_EXERCICIO", "id_SERVIDOR_PORTAL", "FUNCAO","ORG_EXERCICIO", "DESCRICAO_CARGO", "CLASSE_CARGO","NIVEL_FUNCAO", "JORNADA_DE_TRABALHO", "ATIVIDADE", "UORG_LOTACAO", "ORG_LOTACAO", "SITUACAO_VINCULO", "DATA_INGRESSO_ORGAO", "UF_EXERCICIO"))
 cadastrocivil$DESCRICAO_CARGO <- as.character(cadastrocivil$DESCRICAO_CARGO)
 cadastrocivil$CLASSE_CARGO <- as.factor(cadastrocivil$CLASSE_CARGO)
@@ -20,7 +20,7 @@ cadastrocivil$UF_EXERCICIO <- as.character(cadastrocivil$UF_EXERCICIO)
 
 #transformar jornada para horas INT, para poder fazer média...
 
-cadastro <- read.csv2("/home/gudnunes/Área de Trabalho/Mineração de dados/MD2018/dados/cadastrocivil.csv")
+cadastro <- read.csv2("/home/gudnunes/Área de Trabalho/Mineração de dados/MD2018/dados/cadastro.csv")
 horario = rep(0, nrow(cadastro))
 i = 1
 for (aux in as.character(cadastro$JORNADA_DE_TRABALHO)) {

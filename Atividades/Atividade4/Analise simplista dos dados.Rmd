@@ -2,16 +2,18 @@
 title: "Exposição simples de dados"
 author: "Bernardo"
 date: "28 de agosto de 2018"
-output:
-  html_document: default
-  pdf_document: default
+output: html_document
 ---
 
 #Relação da Jornada de trabalho em horas por semana:
 #A média da jornada de trabalho é 40 horas por semana.
 ```{r}
+require(dplyr)
+require(ggplot2)
 
-cadastro <- read.csv2("/home/gudnunes/Área de Trabalho/Mineração de dados/MD2018/dados/cadastrocivil.csv")
+#transformar jornada para horas INT, para poder fazer média...
+
+cadastro <- read.csv2("/home/gudnunes/Área de Trabalho/MD/MD2018/cadastrocivil.csv", header = TRUE, sep = ";")
 horario = rep(0, nrow(cadastro))
 i = 1
 for (aux in as.character(cadastro$JORNADA_DE_TRABALHO)) {
@@ -58,6 +60,8 @@ for (aux in as.character(cadastro$JORNADA_DE_TRABALHO)) {
   i = i + 1
   
 }
+
+
 
 boxplot(horario, horizontal = T)
 

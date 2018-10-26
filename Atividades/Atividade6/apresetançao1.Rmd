@@ -25,7 +25,7 @@ require(ggplot2)
 require(pacman)
 
 
-social <- read.csv2("/home/gudnunes/Área de Trabalho/MD/MD2018/dados/cadastrocivil.csv")
+social <- read.csv2("/home/gudnunes/Área de Trabalho/MD/MD2018/cadastrocivil.csv", header = TRUE, sep = ";")
 
 
   manter=c(); 
@@ -49,7 +49,7 @@ manter <- c( "Id_SERVIDOR_PORTAL",   "NOME", "UF_EXERCICIO",
 
 social <- social %>% select(manter) %>% filter(FUNCAO!="Sem informacao")
 
-remuneracao <- read_csv2("/home/gudnunes/Área de Trabalho/Mineração de dados/MD2018/dados/Remuneracao.csv")
+remuneracao <- read_csv2("/home/gudnunes/Área de Trabalho/MD/MD2018/Remuneracao.csv")
 remuneracao <- remuneracao %>% select(Id_SERVIDOR_PORTAL, `REMUNERACAO BASICA BRUTA (R$)`, `REMUNERACAO APOS DEDUCOES OBRIGATORIAS (R$)`)
 social<-left_join(x=social,y=remuneracao)
 
