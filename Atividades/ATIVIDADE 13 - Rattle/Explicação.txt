@@ -1,0 +1,1 @@
+Apenas alguns prints com demonstração do uso do Rattle em R.

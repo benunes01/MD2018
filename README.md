@@ -1,18 +1,25 @@
-# MD2018
+# Mineração de dados Atividades
 
-Bem-vindo(a) à Disciplina GBC212 - Mineração de Dados, Universidade Federal de Uberlândia
+<h4>Criação do <strong>Makefile</strong> para baixar os dados usados de forma simples</h4>
 
-Primeiros Passos:
+<br>
+<br>
 
-1) Escolha o dataset que você irá usar nas próximas atividades da disciplina
-na lista do site http://www.facom.ufu.br/~albertini/md
+<h4>Demonstração de algumas previsões em dataSets do Kaggle</h4>
 
-2) Envie email para o professor para confirmar escolha
+<br>
 
-3) Com a escolha do dataset confirmada, crie o seu repositório github como um fork.
+<h3>Principais métodos de aprendizado para <strong>classificação</strong> e <strong>regressão</strong> usados nesse projeto:</h3>
 
-Depois, use os seguintes comandos ou use a interface do rstudio
+<h4>SVM</h4>
+<h4>Random Forest</h4>
+<h4>CNN</h4>
+<h4>Rede neural NeuralNet</h4>
+<h4>Caret</h4>
+<h4>SVM para textos do Twitter</h4>
+<h4>Sistema de recomendação de filmes</h4>
 
-git clone https://github.com/albertiniufu/MD2018/
 
-cd MD2018  # mudar para o diretório do projeto
+
+
+
