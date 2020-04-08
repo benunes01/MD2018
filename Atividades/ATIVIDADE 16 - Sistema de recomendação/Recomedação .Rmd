@@ -1,0 +1,58 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(pacman)
+p_load(rrecsys)
+require(rrecsys)
+
+#DataSet de notas sobre filmes
+data("mlLatest100k")
+
+ML <- defineData(mlLatest100k)
+
+#Os filmes mais avaliados
+head(sort(colRatings(ML),decreasing = T))
+
+#Usuarios que mais votam
+head(sort(rowRatings(ML),dec=T))
+
+#Esparsidade dos dados
+sparsity(ML)
+
+#COlocar dados em escala
+ML <- defineData(mlLatest100k, minimum = .5, maximum = 5, intScale = TRUE)
+
+#Pegando apenas uma parte dos dados
+subML <- ML[rowRatings(ML)>200, colRatings(ML) >200]
+
+#Trabalhar ocm menos dados esparsos
+sparsity(subML)
+
+#Treino do recomendador
+
+userBasedRec <- rrecsys(subML, "ubknn", simFunct="Pearson")
+itemBasedRec <- rrecsys(subML, "ibknn", simFunct="cos")
+
+#Emite as 3 principais recomendações para cada usuario usando os maiores ratings previstos
+recsMaioresRatings <- recommendHPR(userBasedRec, topN = 3) 
+
+#Avaliação
+avaliação <- evalModel(subML, folds = 5)
+
+#Resultado
+e <- evalModel(subML, folds = 2)
+globAv <- evalPred(e, alg = "globalaverage")
+itemAv <- evalPred(e,  "itemAver")
+userAv <- evalPred(e,  "useraverage")
+
+#Avalariar estimação com filtragem colaborativa baseada em K-NN
+e <- evalModel(subML, folds = 2)
+evalPred(e, "ubknn", simFunct = "Pearson", neigh = 10)
+
+
+##Lembrar de criar uma recomendação de filmes para eu mesmo!
+```
+

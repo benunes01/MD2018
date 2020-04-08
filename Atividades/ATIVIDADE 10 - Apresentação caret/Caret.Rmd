@@ -1,3 +1,9 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
 require(ggplot2)
 require(dplyr)
 require(pacman)
@@ -34,3 +40,5 @@ diamantecaret <- train(
 testeclasses <- predict(diamantecaret, teste)
 table(testeclasses, teste$cut)
 confusionMatrix(testeclasses, teste$cut)
+```
+

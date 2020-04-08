@@ -1,0 +1,81 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+Analisando alguns Tweets com SVM
+
+```{r setup, include=FALSE}
+
+
+require(pacman)
+p_load(readtext, tidyverse, quanteda)
+
+#Organizar os tweets
+colunas <- cols(docID = col_integer(),
+     Opiniao = col_factor(NULL),
+     Texto = col_character())
+textoDosTweets <- read_csv("http://www.facom.ufu.br/~albertini/1000tweets.csv", col_types = colunas)
+textoDosTweets$Texto <- tolower(textoDosTweets$Texto)
+
+#Criando o corpus
+tweets <- corpus(textoDosTweets, docid_field = "docID", text_field = "Texto")
+summary(tweets, 5)
+
+#Vizualizar palavra de acordo com o contexto
+kwic(tokens(tweets),'bad')
+
+#Separar twwets com opiniao 0 e 1
+tweets0 <- corpus_subset(tweets,Opiniao == 0)
+tweets1 <- corpus_subset(tweets,Opiniao == 1)
+
+#Verificar quais aparecem o token 'bad'
+kwic(tokens(tweets0),'bad')
+kwic(tokens(tweets1),'bad')
+
+#Remover palavras 'inuteis' para a avaliação
+sample(stopwords("en"),15)
+
+tokensDosTweets <- tokens(tweets, remove_punct = TRUE)
+
+#Construir um índice que representa uma matriz esparsa
+
+indice <- dfm(tokensDosTweets, remove = c("http","quot","amp","gt","just","lt","bit.ly","tinyurl.com","tr.im",stopwords("en"))) %>% dfm_trim(min_docfreq = 2) # usar textstat_frequency
+opiniao <- tweets$documents$Opiniao[ntoken(indice)>0]
+indice <- indice[ntoken(indice)>0,]
+
+indiceTFIDF <- dfm_tfidf(indice, scheme_tf = "boolean", scheme_df = "count")
+
+
+#---Vizualizar como matriz---
+
+#matriz <- as.matrix(indiceTFIDF)
+#cat("Dimensões número docs X número de palavras:", dim(matriz),"\n")
+#cat("Exemplos de pesos de documentos:\n")
+#print(matriz[1,1:20])
+
+
+#Para classificar
+#SVM
+
+p_load(e1071,caret)
+require(SparseM)
+
+train <- createDataPartition(opiniao)$Resample1
+tunandoSVM <- tune(svm, train.x = indice[train], 
+                        train.y = opiniao[train], 
+                        kernel="linear", 
+                        ranges=list(cost=10^(-5:5), gamma=2^(-5:5)) )
+summary(tunandoSVM)
+modeloSVM <- tunandoSVM$best.model
+
+
+#Modelo SVM
+
+predicoesSVM <- predict(modeloSVM, newdata = indice[-train])
+
+#Não ficou muito bom, mas é dificil de prever!
+confusionMatrix(predicoesSVM, opiniao[-train])
+
+```
+

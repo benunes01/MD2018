@@ -1,0 +1,73 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+require(ggplot2)
+require(dplyr)
+require(e1071)
+require(pacman)
+require(readr)
+require(caret)
+
+Titanic <- read_csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/train.csv", col_names = TRUE)
+transform.data.frame(Titanic)
+Titanic <- select(Titanic, -c("Cabin", "PassengerId", "Name", "Ticket"))
+na.omit(Titanic)
+Titanic$Survived <- as.factor(Titanic$Survived)
+
+Titanic <- filter(Titanic, is.na(Sex)==F)
+Titanic <- filter(Titanic, is.na(Age)==F)
+Titanic <- filter(Titanic, is.na(Survived)==F)
+Titanic <- filter(Titanic, is.na(SibSp)==F)
+Titanic <- filter(Titanic, is.na(Parch)==F)
+Titanic <- filter(Titanic, is.na(Fare)==F)
+Titanic <- filter(Titanic, is.na(Embarked)==F)
+
+
+treinoT <- sample(1:nrow(Titanic), 600)
+treino <- Titanic[treinoT, ]
+teste <- Titanic[-treinoT, ]
+
+
+
+titanicSVM <- svm(Survived ~ ., data = treino)
+
+preverSobreviventes <- predict(titanicSVM, teste)
+confusionMatrix(preverSobreviventes, teste$Survived)
+
+#---------------
+Titanic1 <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/test.csv")
+
+teste2 <- predict(titanicSVM, Titanic1)
+
+
+Titanic1$Survived <- 0
+Titanic1$Survived <- teste2
+Titanic <- Titanic
+as.data.frame(Titanic)
+
+Titanic <- select(TestMonster, c("Survived", "PassengerId"))
+
+
+write_csv(TestMonster, path = "/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/testMonster.csv")
+
+```
+
+```{r}
+
+```
+
+
+```{r}
+titanicSVM <- svm(Survived ~ ., data = treino, kernel = "radial", cost = 5)
+
+preverSobreviventes <- predict(titanicSVM, teste)
+confusionMatrix(preverSobreviventes, teste$Survived)
+```
+
+```{r}
+plot(preverSobreviventes)
+```
+

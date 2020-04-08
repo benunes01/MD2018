@@ -1,0 +1,32 @@
+---
+title: "Untitled"
+output: html_document
+---
+Relação hierarquica de carros com mtcars
+
+```{r setup, include=FALSE}
+#Encontra matriz de distancia
+d <- dist(as.matrix(mtcars))
+#APlica clustering hierarquico
+hc <- hclust(d)  
+#Traça dendrograma
+plot(hc)
+
+#Usando HCLUST
+
+test.data <- function(dim, num, seed=17) { 
+    set.seed(seed) 
+  matrix(rnorm(dim * num), nrow=num) 
+} 
+m <- test.data(120, 4500) 
+
+#Carrega rpudplus
+library(rpud)
+d <- rpuDist(m)
+
+#rpud
+system.time(hclust(d))
+#rpuHclust
+system.time(rpuHclust(d))
+```
+

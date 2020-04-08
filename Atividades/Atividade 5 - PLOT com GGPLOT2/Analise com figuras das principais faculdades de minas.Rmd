@@ -11,9 +11,8 @@ output: html_document
 require(pacman)
 require(dplyr)
 require(readr)
-require(ggplot2)
 
-cadastro <- read.csv("/home/gudnunes/Área de Trabalho/MD/MD2018/cadastrocivil.csv", skipNul = TRUE, sep = ";", header = TRUE)
+cadastro <- read.csv2("/home/bernardo/Documentos/MD2018/cadastrocivil.csv")
 
 FaculMinas <- filter(cadastro, ORG_EXERCICIO == "UNIVERSIDADE FED.DO TRIANGULO MINEIRO")
 
@@ -39,7 +38,7 @@ manter <- c( "Id_SERVIDOR_PORTAL",   "NOME",
 
 FaculMinas <- FaculMinas %>% select(manter) %>% filter(FUNCAO!="Sem informacao")
 
-remuneracao <- read_csv2("/home/gudnunes/Área de Trabalho/MD/MD2018/Remuneracao.csv")
+remuneracao <- read_csv2("/home/bernardo/Documentos/MD2018/Remuneracao.csv")
 remuneracao <- remuneracao %>% select(Id_SERVIDOR_PORTAL, `REMUNERACAO BASICA BRUTA (R$)`)
 FaculMinas<-left_join(x=FaculMinas,y=remuneracao)
 FaculMinas$DATA_INGRESSO_ORGAO <- as.Date(FaculMinas$DATA_INGRESSO_ORGAO,format="%d/%m/%Y")

@@ -13,7 +13,7 @@ require(ggplot2)
 
 #transformar jornada para horas INT, para poder fazer média...
 
-cadastro <- read.csv2("/home/gudnunes/Área de Trabalho/MD/MD2018/cadastrocivil.csv", header = TRUE, sep = ";")
+cadastro <- read.csv2("/home/bernardo/Documentos/MD2018/cadastrocivil.csv")
 horario = rep(0, nrow(cadastro))
 i = 1
 for (aux in as.character(cadastro$JORNADA_DE_TRABALHO)) {

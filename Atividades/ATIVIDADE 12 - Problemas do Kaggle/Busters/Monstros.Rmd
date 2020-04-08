@@ -1,0 +1,429 @@
+---
+title: "Untitled"
+output: html_document
+---
+```{r}
+
+require(dplyr)
+require(ggplot)
+require(pacman)
+require(caret)
+require(readr)
+require(e1071)
+require(randomForest)
+
+monstros <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/train.csv")
+
+monstros <- select(monstros, -c("id"))
+
+#---------------------------
+##Para fazer o teste final
+
+#monstrosTESTE <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/test.csv")
+
+#monstrosTESTE <- select(monstrosTESTE, -c("id"))
+
+#monstrosTESTE$type <- 0
+
+#monstrosTESTE$type <- as.factor(monstrosTESTE$type)
+
+#--------------------------
+
+set.seed(17)
+
+particionar <- sample(1:nrow(monstros), 310)
+
+treinoMonstros <- monstros[particionar, ]
+testeMonstros <- monstros[-particionar,  ]
+
+rfMonstros <- randomForest(type ~ ., data = monstros, ntree = 1000, mtry=2, importance = TRUE)
+
+rfMonstros
+varImpPlot(rfMonstros)
+
+prever <- predict(rfMonstros, testeMonstros)
+confusionMatrix(prever, testeMonstros$type)
+
+#---------------------
+
+###Para criar e colocar a nova coluna prevista do data set de envio para o Kaggle
+#prever <- predict(rfMonstros,monstrosTESTE, type = "class")
+#ver <- data.frame(type = prever)
+#monstrosTESTE$type <- ver
+
+#--------------------
+```
+
+
+RF sem a variavel Monstro
+
+```{r}
+#Mostrar predição sem o color
+monstros <- select(monstros, -c("color"))
+
+particionar2 <- sample(1:nrow(monstros), 310)
+
+treinoMonstros2 <- monstros[particionar2, ]
+testeMonstros2 <- monstros[-particionar2,  ]
+
+rfMonstros2 <- randomForest(type ~ ., data = treinoMonstros2, ntree = 1000, mtry=2, importance = TRUE)
+
+rfMonstros2
+
+prever2 <- predict(rfMonstros2, testeMonstros2)
+confusionMatrix(prever2, testeMonstros2$type)
+```
+
+
+#---------------------------------------------------
+
+SVM
+
+```{r setup, include=FALSE}
+require(dplyr)
+require(ggplot)
+require(pacman)
+require(caret)
+require(readr)
+require(e1071)
+
+caça <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/train.csv", header = TRUE, sep = ",")
+
+caça <- select(caça, -c("id","color"))
+
+testeBruto <- subset(caça, select = -type)
+resultado <- caça$type
+
+#criando modelo SVM
+modelo_svm <- svm(type ~ ., data = caça, kernel = "radial", cost = 5)
+
+#resumo do modelo
+summary(modelo_svm)
+
+#verificar a predição
+teste1 <- predict(modelo_svm, testeBruto)
+#Matriz de confusão, valores na diagonal são os acertados
+table(teste1, resultado)
+
+#Analise com detalhes
+confusionMatrix(caça$type, teste1)
+```
+
+
+-------------------------------
+COM TUNE SVM
+
+```{r}
+require(dplyr)
+require(ggplot)
+require(pacman)
+require(caret)
+require(readr)
+require(e1071)
+
+caça <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/train.csv", header = TRUE, sep = ",")
+
+caça <- select(caça, -c("id","color"))
+
+testeBruto <- subset(caça, select = -type)
+resultado <- caça$type
+
+tuned_parameters <- tune.svm (type ~ ., data = caça, gamma = 10 ^ (- 5: -1), cost = 10 ^ (- 3: 1))
+
+modelo_svm <- svm(type ~ ., data = caça, kernel = "radial", cost = 200)
+
+teste1 <- predict(modelo_svm, testeBruto)
+
+confusionMatrix(caça$type, teste1)
+
+summary(tuned_parameters)
+
+#mandando teste -------------------------
+
+monstrosTESTE <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/test.csv")
+
+teste1 <- predict(rfMonstros, monstrosTESTE)
+
+
+monstrosTESTE$type <- 0
+monstrosTESTE$type <- teste1
+TestMonster <- monstrosTESTE
+as.data.frame(TestMonster)
+
+TestMonster <- select(TestMonster, c("type", "id"))
+
+
+write_csv(TestMonster, path = "/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/testMonster.csv")
+#---------------------------------
+```
+
+
+
+
+#--------------------------------------------------------
+##Rede neural
+
+```{r}
+require(dplyr)
+require(pacman)
+require(ggplot2)
+require(neural)
+library(ISLR)
+library(caTools)
+require(neuralnet)
+require(caret)
+
+caça <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/train.csv", header = TRUE, sep = ",")
+
+caça <- select(caça, -c("id","color"))
+
+as.data.frame(unclass(caça))
+
+caça <- data.frame(caça)
+
+partiçaocaça <- createDataPartition(y = caça$type, 
+                               p = 0.8, list = FALSE)
+# subset power_plant data to training
+treinocaça <- caça[partiçaocaça,]
+# subset the rest to test
+testecaça <- caça[-partiçaocaça,]
+
+set.seed(100)
+
+
+redeMonstro = train(type ~ .,
+              data = caça,
+              method = "nnet" ,
+              preProc = c("center", "scale")
+              
+              )
+
+prever <- predict(redeMonstro, testecaça)
+
+confusionMatrix(prever, testecaça$type)
+```
+
+CARET com RF
+
+
+```{r}
+require(dplyr)
+require(pacman)
+require(ggplot2)
+require(neural)
+library(ISLR)
+library(caTools)
+require(neuralnet)
+require(caret)
+
+caçarf <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/train.csv", header = TRUE, sep = ",")
+
+caçarf <- select(caçarf, -c("id","color"))
+
+as.data.frame(unclass(caçarf))
+
+
+partiçaocaçarf <- createDataPartition(y = caçarf$type, 
+                               p = 0.8, list = FALSE)
+# subset power_plant data to training
+treinocaçarf <- caçarf[partiçaocaçarf,]
+# subset the rest to test
+testecaçarf <- caçarf[-partiçaocaçarf,]
+
+set.seed(100)
+
+
+rfMonstro = train(type ~ .,
+              data = treinocaçarf,
+              method = "RRF" ,
+              preProc = c("center", "scale")
+              
+              )
+
+preverRF <- predict(rfMonstro, testecaçarf)
+
+confusionMatrix(preverRF, testecaçarf$type)
+```
+
+Testando MLP
+
+```{r}
+require(dplyr)
+require(pacman)
+require(ggplot2)
+require(neural)
+library(ISLR)
+library(caTools)
+require(neuralnet)
+require(caret)
+
+caçamlp <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/train.csv", header = TRUE, sep = ",")
+
+caçamlp <- select(caçamlp, -c("id","color"))
+
+as.data.frame(unclass(caçamlp))
+
+
+partiçaocaçamlp <- createDataPartition(y = caçamlp$type, 
+                               p = 0.8, list = FALSE)
+# subset power_plant data to training
+treinocaçamlp <- caçamlp[partiçaocaçamlp,]
+# subset the rest to test
+testecaçamlp <- caçamlp[-partiçaocaçamlp,]
+
+set.seed(100)
+
+
+MLPMonstro = train(type ~ .,
+              data = caçamlp,
+              method = "mlp" ,
+              preProc = c("center", "scale")
+              
+              )
+
+preverMLP <- predict(MLPMonstro, testecaçamlp)
+
+confusionMatrix(preverMLP, testecaçamlp$type)
+
+#-------------------
+monstrosTESTE <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/test.csv")
+
+teste1 <- predict(redeMonstro, monstrosTESTE)
+
+
+monstrosTESTE$type <- 0
+monstrosTESTE$type <- teste1
+TestMonster <- monstrosTESTE
+as.data.frame(TestMonster)
+
+TestMonster <- select(TestMonster, c("type", "id"))
+
+
+write_csv(TestMonster, path = "/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/testMonster.csv")
+```
+
+KNN
+```{r}
+require(dplyr)
+require(pacman)
+require(ggplot2)
+require(neural)
+library(ISLR)
+library(caTools)
+require(neuralnet)
+require(caret)
+
+caçaKNN <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/train.csv", header = TRUE, sep = ",")
+
+caçaKNN <- select(caçaKNN, -c("id","color"))
+
+as.data.frame(unclass(caçaKNN))
+
+
+partiçaocaçaKNN <- createDataPartition(y = caçaKNN$type, 
+                               p = 0.8, list = FALSE)
+# subset power_plant data to training
+treinocaçaKNN <- caçaKNN[partiçaocaçaKNN,]
+# subset the rest to test
+testecaçaKNN <- caçaKNN[-partiçaocaçaKNN,]
+
+set.seed(100)
+
+
+KNNMonstro = train(type ~ .,
+              data = treinocaçaKNN,
+              method = "knn" ,
+              preProc = c("center", "scale")
+              
+              )
+
+preverKNN <- predict(KNNMonstro, testecaçaKNN)
+
+confusionMatrix(preverKNN, testecaçaKNN$type)
+```
+
+
+
+C50 Arvores
+
+```{r}
+require(dplyr)
+require(pacman)
+require(ggplot2)
+require(neural)
+library(caTools)
+require(C50)
+require(caret)
+
+caçaC50 <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/train.csv", header = TRUE, sep = ",")
+
+caçaC50 <- select(caçaC50, -c("id","color"))
+
+as.data.frame(unclass(caçaC50))
+
+
+caçaC50 <- caçaC50[ sample( nrow( caçaC50 ) ), ]
+X <- caçaC50[,1:4]
+y <- caçaC50[,5]
+
+trainX <- X[1:310,]
+trainy <- y[1:310]
+testX <- X[311:371,]
+testy <- y[311:371]
+
+set.seed(100)
+
+model <- C50::C5.0( trainX, trainy )
+mod1  <-  C5.0 ( type ~ . , data  =  caça )
+
+preverC50 <- predict(mod1, caça)
+confusionMatrix(preverC50, caça$type)
+sum( preverC50 == testy ) / length( preverC50 )
+
+plot ( mod1 )
+```
+
+Ensembles
+
+```{r}
+require(dplyr)
+require(pacman)
+require(ggplot2)
+require(neural)
+library(caTools)
+require(caret)
+require(caretEnsemble)
+
+caçaEnsembles <- read.csv("/home/bernardo/Documentos/MD2018/Atividades/Atividade 9/Busters/train.csv", header = TRUE, sep = ",")
+
+caçaEnsembles <- select(caçaEnsembles, -c("id","color"))
+
+as.data.frame(unclass(caçaEnsembles))
+
+
+control <- trainControl(method="repeatedcv", number=10, repeats=3, savePredictions=TRUE, classProbs=TRUE)
+Ensembles <- c("rf", "knn", "nnet")
+set.seed(100)
+models <- caretList(type ~ ., data=caçaEnsembles, trControl=control, methodList=Ensembles)
+results <- resamples(models)
+summary(results)
+dotplot(results)
+
+stackControl <- trainControl(method="repeatedcv", number=10, repeats=3, savePredictions=TRUE, classProbs=TRUE)
+set.seed(127)
+
+
+print(stack.glm)
+```
+
+
+
+
+
+
+
+
+
+
+
+
