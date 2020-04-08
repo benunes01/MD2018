@@ -1,11 +1,10 @@
 # Mineração de dados Atividades
 
-<h4>Criação do <strong>Makefile</strong> para baixar os dados usados de forma simples</h4>
+<h4>- Criação do <strong>Makefile</strong> para baixar os dados usados de forma simples</h4>
 
 <br>
-<br>
 
-<h4>Demonstração de algumas previsões em dataSets do Kaggle</h4>
+<h4>- Demonstração de algumas previsões em dataSets do Kaggle</h4>
 
 <br>
 
